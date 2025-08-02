@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
+*.py[cod]
 *$py.class
 
 # C extensions
@@ -24,6 +25,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.pyc
 MANIFEST
 
 # PyInstaller
@@ -205,3 +207,31 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Credenciales
+*.json
+gcp-key.json
+
+# Node
+node_modules/
+
+
+# --- Terraform ---
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# --- Proyecto específico ---
+# Variables de entorno del frontend
+frontend/.env
+frontend/.env.*
+# Variables globales
+.env
+.env.*
+
+# --- Editor ---
+.vscode/
+.idea/
+*.swp
+.DS_Store

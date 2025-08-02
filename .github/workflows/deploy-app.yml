@@ -1,0 +1,74 @@
+name: Deploy App to GCP
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy Infra and App to GCP"]
+    types:
+      - completed
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: hackday-gemini-backend
+  BACKEND_DIR: backend
+  FRONTEND_DIR: frontend
+
+jobs:
+  deploy-app:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # =============================
+      # 1️⃣ BACKEND (Cloud Run)
+      # =============================
+      - name: Build and Push Backend Docker image
+        run: |
+          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+          gcloud builds submit $BACKEND_DIR \
+            --tag ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest
+
+      - name: Deploy Backend to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated
+
+      - name: Get Cloud Run URL
+        id: get-url
+        run: |
+          URL=$(gcloud run services describe $SERVICE_NAME \
+            --region $REGION \
+            --project $PROJECT_ID \
+            --format 'value(status.url)')
+          echo "BACKEND_URL=$URL" >> $GITHUB_ENV
+
+      # =============================
+      # 2️⃣ FRONTEND (Firebase Hosting)
+      # =============================
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Build Frontend with dynamic API URL
+        run: |
+          echo "REACT_APP_API_URL=${BACKEND_URL}" > $FRONTEND_DIR/.env
+          cd $FRONTEND_DIR
+          npm install
+          npm run build
+
+      - name: Deploy Frontend to Firebase Hosting
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
