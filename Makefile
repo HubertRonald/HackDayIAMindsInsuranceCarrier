@@ -92,20 +92,44 @@ destroy-actions:
 	@echo "🗑️ Workflow 'destroy-infra.yml' disparado en GitHub Actions."
 
 # ==============================
+# Ejecutar backend en Docker (local)
+# ==============================
+
+# Usar imagen ya construida en Artifact Registry
+run-local-docker:
+	docker run --rm -it \
+		-p 8080:8080 \
+		--env-file .env \
+		-v $(PWD)/backend/credenciales.json:/app/credenciales.json:ro \
+		$(REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/hackday-repo/hackday-gemini-backend:latest
+
+# Construir imagen local y ejecutar (sin subir a Artifact Registry)
+run-local-docker-build:
+	docker build -t hackday-gemini-backend-local ./backend
+	docker run --rm -it \
+		-p 8080:8080 \
+		--env-file .env \
+		-v $(PWD)/backend/credenciales.json:/app/credenciales.json:ro \
+		hackday-gemini-backend-local
+
+
+# ==============================
 # Ayuda
 # ==============================
 help:
 	@echo "Comandos disponibles:"
-	@echo "  make deploy-infra       - Despliega infraestructura con Terraform"
-	@echo "  make destroy-infra      - Destruye infraestructura"
-	@echo "  make validate-infra     - Valida que BigQuery y Firestore estén disponibles"
-	@echo "  make generate-dummy     - Genera CSV con datos dummy (local)"
-	@echo "  make load-dummy         - Carga datos dummy a GCP (local)"
-	@echo "  make populate-data      - Genera y carga datos dummy (local)"
-	@echo "  make setup-data         - Despliega infra y carga datos dummy (local)"
-	@echo "  make deploy-backend     - Despliega backend a Cloud Run"
-	@echo "  make deploy-frontend    - Despliega frontend a Firebase Hosting (inyecta URL real de Cloud Run)"
-	@echo "  make deploy-app         - Despliega backend + frontend"
-	@echo "  make deploy-actions     - Dispara workflow de despliegue en GitHub Actions"
-	@echo "  make populate-actions   - Dispara workflow de carga de datos dummy en GitHub Actions"
-	@echo "  make destroy-actions    - Dispara workflow para destruir infraestructura y app en GCP"
+	@echo "  make deploy-infra       		- Despliega infraestructura con Terraform"
+	@echo "  make destroy-infra      		- Destruye infraestructura"
+	@echo "  make validate-infra     		- Valida que BigQuery y Firestore estén disponibles"
+	@echo "  make generate-dummy     		- Genera CSV con datos dummy (local)"
+	@echo "  make load-dummy         		- Carga datos dummy a GCP (local)"
+	@echo "  make populate-data      		- Genera y carga datos dummy (local)"
+	@echo "  make setup-data         		- Despliega infra y carga datos dummy (local)"
+	@echo "  make deploy-backend     		- Despliega backend a Cloud Run"
+	@echo "  make deploy-frontend    		- Despliega frontend a Firebase Hosting (inyecta URL real de Cloud Run)"
+	@echo "  make deploy-app         		- Despliega backend + frontend"
+	@echo "  make deploy-actions     		- Dispara workflow de despliegue en GitHub Actions"
+	@echo "  make populate-actions   		- Dispara workflow de carga de datos dummy en GitHub Actions"
+	@echo "  make destroy-actions    		- Dispara workflow para destruir infraestructura y app en GCP"
+	@echo "  make run-local-docker   		- Para correr con la imagen ya desplegada en GCP (Artifact Registry)"
+	@echo "  make run-local-docker-build    - Para probar cambios locales sin subirlos"
