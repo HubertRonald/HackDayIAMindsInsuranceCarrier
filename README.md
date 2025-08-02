@@ -38,7 +38,6 @@ Permite:
 - **Simulación dinámica de cotizaciones**.
 - **Interacción gráfica en tiempo real** (tooltips, resaltar campos) mediante WebSockets.
 
----
 
 ## 📂 Estructura del Proyecto
 
@@ -91,8 +90,6 @@ Permite:
 └── .gitignore
 ```
 
----
-
 ## ⚙️ Configuración Local
 
 ### 1️⃣ Clonar el repositorio
@@ -123,7 +120,6 @@ npm start
 
 El frontend usará la variable `REACT_APP_API_URL` definida en `.env` (`http://localhost:8080` para desarrollo).
 
----
 
 ## 🔑 Variables de Entorno
 
@@ -134,7 +130,6 @@ El frontend usará la variable `REACT_APP_API_URL` definida en `.env` (`http://l
 | BIGQUERY\_DATASET | Dataset BigQuery (por defecto `hackday_data`)      |
 | BIGQUERY\_TABLE   | Tabla BigQuery (por defecto `gemini_interactions`) |
 
----
 
 ## ☁️ Despliegue con GitHub Actions
 
@@ -148,7 +143,6 @@ El frontend usará la variable `REACT_APP_API_URL` definida en `.env` (`http://l
 
 2. Los workflows se disparan automáticamente al hacer **push a main** o se pueden ejecutar manualmente.
 
----
 
 ## 🏗️ Comandos `make ...-actions`
 
@@ -158,7 +152,6 @@ El frontend usará la variable `REACT_APP_API_URL` definida en `.env` (`http://l
 | make populate-actions | `.github/workflows/populate-data.yml` | 📦 Pobla BigQuery y Firestore con datos dummy.                         |
 | make destroy-actions  | `.github/workflows/destroy-infra.yml` | 🗑️ Elimina infraestructura, servicio Cloud Run y Firebase Hosting.    |
 
----
 
 ## 🔄 Flujo CI/CD
 
@@ -173,7 +166,6 @@ flowchart LR
     F --> G[Populate Data Workflow opcional]
 ```
 
----
 
 ## 📊 Datos Dummy y Métricas
 
@@ -191,7 +183,6 @@ Esto genera `gemini_interactions_dummy.csv` con 100 registros y los carga a **Bi
 - Tendencias de interacciones en el tiempo.
 - Matriz Producto vs Etapa (heatmap).
 
----
 
 ## 🔮 Futuras Mejoras
 
@@ -201,16 +192,16 @@ Esto genera `gemini_interactions_dummy.csv` con 100 registros y los carga a **Bi
 - Autenticación y control de sesiones de usuario.
 
 
---
+
 ## Autores
----
+
 * **Hubert Ronald** - *Trabajo Inicial* - [HubertRonald / HackDayIAMindsInsuranceCarrier](https://github.com/HubertRonald/HackDayIAMindsInsuranceCarrier)
 
 Ve también la lista de [contribuyentes](https://github.com/HubertRonald/HackDayIAMindsInsuranceCarrier/contributors) que participaron en este proyecto.
 
 
 ## Licencia
----
+
 Este proyecto está bajo licencia MIT - ver la [LICENCIA](LICENSE) archivo (en inglés) con más detalles
 
 

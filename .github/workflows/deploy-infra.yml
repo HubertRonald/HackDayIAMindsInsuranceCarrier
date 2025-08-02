@@ -57,29 +57,45 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      # ---- BACKEND ----
+      # =============================
+      # 1️⃣ BACKEND (Cloud Run)
+      # =============================
       - name: Build and Push Backend Docker image
         run: |
           gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
           gcloud builds submit $BACKEND_DIR \
-            --tag ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest
+            --tag ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/$SERVICE_NAME:latest
 
-      - name: Deploy Backend to Cloud Run
+      - name: Deploy Backend to Cloud Run (with SA auth)
         run: |
           gcloud run deploy $SERVICE_NAME \
-            --image ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest \
+            --image ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/$SERVICE_NAME:latest \
             --region $REGION \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID
 
-      # ---- FRONTEND ----
+      - name: Get Cloud Run URL
+        id: get-url
+        run: |
+          URL=$(gcloud run services describe $SERVICE_NAME \
+            --region $REGION \
+            --project $PROJECT_ID \
+            --format 'value(status.url)')
+          echo "BACKEND_URL=$URL" >> $GITHUB_ENV
+
+      # =============================
+      # 2️⃣ FRONTEND (Firebase Hosting)
+      # =============================
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Build Frontend for Production
+      - name: Build Frontend with dynamic API URL
         run: |
+          cp $FRONTEND_DIR/.env.example $FRONTEND_DIR/.env
+          sed -i '/^REACT_APP_API_URL=/d' $FRONTEND_DIR/.env
+          echo "REACT_APP_API_URL=${BACKEND_URL}" >> $FRONTEND_DIR/.env
           cd $FRONTEND_DIR
-          echo "REACT_APP_API_URL=https://${SERVICE_NAME}-${REGION}-a.run.app" > $FRONTEND_DIR/.env
           npm install
           npm run build
 

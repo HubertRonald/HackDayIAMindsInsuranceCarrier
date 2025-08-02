@@ -56,6 +56,20 @@ resource "google_service_account" "cloud_run_sa" {
   display_name = "Service Account for Cloud Run Backend"
 }
 
+# ---------- PERMISOS FIRESTORE ----------
+resource "google_project_iam_member" "firestore_access" {
+  project = var.project_id
+  role    = "roles/datastore.user"
+  member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+}
+
+# ---------- PERMISOS BIGQUERY ----------
+resource "google_project_iam_member" "bigquery_access" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+}
+
 # ---------- CLOUD RUN SERVICE ----------
 resource "google_cloud_run_service" "backend" {
   name     = var.service_name
