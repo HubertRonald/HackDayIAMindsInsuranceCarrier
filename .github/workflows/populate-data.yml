@@ -9,9 +9,9 @@ on:
   workflow_dispatch: # También ejecutable manualmente desde GitHub Actions
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: us-central1
-  GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/terraform/gcp-key.json
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GCP_REGION }}
+  DATA_DIR: data
 
 jobs:
   populate-data:
@@ -28,7 +28,7 @@ jobs:
           python-version: '3.9'
 
       - name: Install Python dependencies
-        working-directory: data
+        working-directory: ${{ env.DATA_DIR }}
         run: |
           python -m pip install --upgrade pip
           pip install google-cloud-bigquery google-cloud-firestore
@@ -40,6 +40,7 @@ jobs:
 
       - name: Validate BigQuery dataset
         run: |
+          echo "🔍 Validando dataset BigQuery..."
           if ! gcloud bigquery datasets describe hackday_data --project=${{ env.PROJECT_ID }}; then
             echo "❌ Dataset BigQuery no encontrado. Asegúrate de ejecutar Terraform primero."
             exit 1
@@ -47,17 +48,20 @@ jobs:
 
       - name: Validate Firestore
         run: |
+          echo "🔍 Validando instancia Firestore..."
           if ! gcloud firestore databases describe --project=${{ env.PROJECT_ID }} --location=nam5; then
             echo "❌ Firestore no encontrado. Asegúrate de ejecutar Terraform primero."
             exit 1
           fi
 
       - name: Generate Dummy Data
-        working-directory: data
+        working-directory: ${{ env.DATA_DIR }}
         run: |
+          echo "⚙️ Generando datos dummy..."
           python generate_dummy_data.py
 
       - name: Load Dummy Data into BigQuery & Firestore
-        working-directory: data
+        working-directory: ${{ env.DATA_DIR }}
         run: |
+          echo "📥 Cargando datos dummy a BigQuery y Firestore..."
           python load_dummy_data.py
