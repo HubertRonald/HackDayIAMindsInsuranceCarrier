@@ -62,8 +62,7 @@ Permite:
 │   │   ├── favicon.ico
 │   │   ├── manifest.json
 │   │   └── robots.txt
-│   ├── package.json
-│   └── .env.example
+│   └── package.json
 │
 ├── terraform/
 │   ├── main.tf
