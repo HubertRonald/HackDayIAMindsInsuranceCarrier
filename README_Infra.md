@@ -77,3 +77,61 @@ flowchart TD
     E -->|App disponible| F[🌐 URL Pública en Firebase Hosting]
 
 ```
+
+## ⚙️ Configuración de GitHub Actions (Variables y Secrets)
+
+Este archivo define qué variables y secrets necesitas configurar en el repositorio para habilitar el CI/CD en GCP con GitHub Actions.
+
+1️⃣ Repository → Variables (no sensibles)
+
+Estas son visibles para todos los colaboradores del repositorio, pero no contienen información sensible:
+
+| **Nombre**       | **Ejemplo**              | **Uso en los workflows**                              |
+| ---------------- | ------------------------ | ----------------------------------------------------- |
+| `GCP_PROJECT_ID` | `hackday-project-1234`   | ID del proyecto GCP (`deploy`, `destroy`, `populate`) |
+| `GCP_REGION`     | `us-central1`            | Región donde se despliega Cloud Run y Firebase        |
+| `SERVICE_NAME`   | `hackday-gemini-backend` | Nombre del servicio en Cloud Run                      |
+| `BACKEND_DIR`    | `backend`                | Carpeta backend para la build Docker                  |
+| `FRONTEND_DIR`   | `frontend`               | Carpeta frontend para build Firebase                  |
+| `TF_DIR`         | `terraform`              | Carpeta con configuración Terraform                   |
+
+
+2️⃣ Repository → Secrets (privados y cifrados)
+
+Estos contienen credenciales y datos sensibles, no visibles para los colaboradores.
+
+| **Nombre**       | **Descripción**                                                                                                                                                       | **Cómo obtenerlo**                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `GCP_SA_KEY`     | Contenido del archivo JSON de la Service Account con permisos mínimos (`BigQuery Data Editor`, `Cloud Datastore User`, `Artifact Registry Reader`, `Cloud Run Admin`) | Google Cloud Console → IAM & Admin → Service Accounts → Keys → JSON        |
+| `FIREBASE_TOKEN` | Token de autenticación para Firebase Hosting CI/CD                                                                                                                    | Ejecuta `firebase login:ci` en tu terminal local y copia el token generado |
+
+
+3️⃣ Opcionales (solo si se requiere usar en scripts Python)
+
+| **Nombre**         | **Ejemplo**           | **Uso**                             |
+| ------------------ | --------------------- | ----------------------------------- |
+| `BIGQUERY_DATASET` | `hackday_data`        | Dataset donde se cargan datos dummy |
+| `BIGQUERY_TABLE`   | `gemini_interactions` | Tabla de destino en BigQuery        |
+
+> ⚠️ Si no defines estas variables en GitHub, tus scripts usarán los valores por defecto (hackday_data, gemini_interactions) ya configurados en db.py y load_dummy_data.py.
+
+4️⃣ Dónde configurarlos
+
+    Ve a tu repositorio en GitHub.
+
+    En la pestaña Settings → Secrets and variables → Actions:
+
+        En Variables, añade los valores de la sección 1️⃣.
+
+        En Secrets, añade los valores de la sección 2️⃣.
+
+    Guarda los cambios.
+
+5️⃣ Verificación
+
+Ejecuta el siguiente comando para confirmar que los workflows ven correctamente las variables:
+
+```bash
+gh variable list
+gh secret list
+```
