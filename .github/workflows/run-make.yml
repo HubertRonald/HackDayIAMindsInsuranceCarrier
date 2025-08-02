@@ -1,0 +1,26 @@
+name: Run Makefile on PR to main
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed  # incluye merge
+
+jobs:
+  run-make:
+    if: github.event.pull_request.merged == true || github.event.action != 'closed'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Make
+        run: sudo apt-get install -y make
+
+      - name: Run setup-data
+        run: make setup-data

@@ -1,0 +1,8 @@
+# Bloquea por defecto todos los rastreadores (útil en entornos de prueba)
+User-agent: *
+Disallow: /
+
+# Si tu aplicación pasa a producción y quieres habilitar indexación,
+# reemplaza por:
+# User-agent: *
+# Allow: /

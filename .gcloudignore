@@ -1,0 +1,54 @@
+# Basado en .gitignore para optimizar builds en Cloud Build / Cloud Run
+
+# Archivos y carpetas de control de versiones
+.git/
+.gitignore
+.gcloudignore
+
+# Archivos temporales y de sistema
+.DS_Store
+*.swp
+*.log
+
+# Archivos de compilación / caché
+__pycache__/
+*.py[cod]
+*$py.class
+node_modules/
+build/
+dist/
+coverage/
+*.egg-info/
+*.egg
+
+# Terraform (estado y caché)
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform.lock.hcl
+
+# Virtual environments
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Archivos de configuración local y secretos
+.env
+.env.*
+*.json
+*.key
+*.pem
+gcp-key.json
+
+# Datos dummy (no necesarios en producción)
+data/gemini_interactions_dummy.csv
+
+# Archivos de editor
+.vscode/
+.idea/
+
+# Otros
+*.bak
+*.tmp

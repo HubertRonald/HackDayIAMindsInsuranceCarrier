@@ -1,0 +1,88 @@
+name: Deploy Infra and App to GCP
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: hackday-gemini-backend
+  BACKEND_DIR: backend
+  FRONTEND_DIR: frontend
+  TF_DIR: terraform
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.TF_DIR }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup GCP Key
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > gcp-key.json
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Init Terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="credentials_file=$GITHUB_WORKSPACE/gcp-key.json"
+
+  deploy-app:
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # ---- BACKEND ----
+      - name: Build and Push Backend Docker image
+        run: |
+          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+          gcloud builds submit $BACKEND_DIR \
+            --tag ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest
+
+      - name: Deploy Backend to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated
+
+      # ---- FRONTEND ----
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Build Frontend for Production
+        run: |
+          cd $FRONTEND_DIR
+          echo "REACT_APP_API_URL=https://${SERVICE_NAME}-${REGION}-a.run.app" > $FRONTEND_DIR/.env
+          npm install
+          npm run build
+
+      - name: Deploy Frontend to Firebase Hosting
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
