@@ -1,23 +1,56 @@
-name: Deploy App to GCP
+name: Deploy Infra and App to GCP
 
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["Deploy Infra and App to GCP"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+      - 'releases/**'
+  pull_request:
+    types: [opened, synchronize]
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: us-central1
-  SERVICE_NAME: hackday-gemini-backend
-  BACKEND_DIR: backend
-  FRONTEND_DIR: frontend
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GCP_REGION }}
+  SERVICE_NAME: ${{ vars.GCP_SERVICE_NAME }}
+  BACKEND_DIR: ${{ vars.BACKEND_DIR }}
+  FRONTEND_DIR: ${{ vars.FRONTEND_DIR }}
+  TF_DIR: ${{ vars.TF_DIR }}
 
 jobs:
-  deploy-app:
+  # =============================
+  # 1️⃣ Terraform - Infraestructura
+  # =============================
+  terraform:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    defaults:
+      run:
+        working-directory: ${{ env.TF_DIR }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup GCP Key
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > gcp-key.json
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="credentials_file=$GITHUB_WORKSPACE/gcp-key.json"
+
+  # =============================
+  # 2️⃣ Deploy App (Backend + Frontend)
+  # =============================
+  deploy-app:
+    needs: terraform
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -30,22 +63,21 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      # =============================
-      # 1️⃣ BACKEND (Cloud Run)
-      # =============================
+      # ---- BACKEND ----
       - name: Build and Push Backend Docker image
         run: |
           gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
           gcloud builds submit $BACKEND_DIR \
-            --tag ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest
+            --tag ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/$SERVICE_NAME:latest
 
       - name: Deploy Backend to Cloud Run
         run: |
           gcloud run deploy $SERVICE_NAME \
-            --image ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/hackday-gemini-backend:latest \
+            --image ${REGION}-docker.pkg.dev/$PROJECT_ID/hackday-repo/$SERVICE_NAME:latest \
             --region $REGION \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID
 
       - name: Get Cloud Run URL
         id: get-url
@@ -56,15 +88,20 @@ jobs:
             --format 'value(status.url)')
           echo "BACKEND_URL=$URL" >> $GITHUB_ENV
 
-      # =============================
-      # 2️⃣ FRONTEND (Firebase Hosting)
-      # =============================
+      # ---- FRONTEND ----
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
+      - name: Validate Firebase Token
+        run: |
+          echo "🔍 Verificando autenticación con Firebase..."
+          firebase list --token "${{ secrets.FIREBASE_TOKEN }}" || (echo "❌ Token inválido o caducado" && exit 1)
+
       - name: Build Frontend with dynamic API URL
         run: |
-          echo "REACT_APP_API_URL=${BACKEND_URL}" > $FRONTEND_DIR/.env
+          cp $FRONTEND_DIR/.env.example $FRONTEND_DIR/.env
+          sed -i '/^REACT_APP_API_URL=/d' $FRONTEND_DIR/.env
+          echo "REACT_APP_API_URL=${BACKEND_URL}" >> $FRONTEND_DIR/.env
           cd $FRONTEND_DIR
           npm install
           npm run build
