@@ -1,10 +1,15 @@
+import '../App.css';
+
+
 function Footer() {
-    return (
-      <footer style={{ marginTop: '20px', padding: '10px', textAlign: 'center', fontSize: '0.9em', color: '#666' }}>
-        <p>© 2025 HackDay IAMinds Insurance Carrier</p>
-      </footer>
-    );
-  }
-  
-  export default Footer;
-  
+  return (
+    <footer className="app-footer">
+      <p>
+        © 2025 HackDay IAMinds<br />
+        <span className="footer-rights">HubertRonald</span>
+      </p>
+    </footer>
+  );
+}
+
+export default Footer;

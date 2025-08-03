@@ -1,0 +1,344 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.app-container {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #f7f8fa;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* =====================
+   Header flotante
+===================== */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #fff;
+    color: #d32f2f;
+    padding: 16px 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.8rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Contenido del header con icono y texto alineados */
+  .header-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .header-icon {
+    flex-shrink: 0;
+    color: #d32f2f;
+  }
+  
+  /* Texto del título */
+  .header-content h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #d32f2f;
+    transition: font-size 0.3s ease;
+  }
+  
+  /* Efecto reducido al hacer scroll */
+  .header-small {
+    padding: 10px 20px;
+  }
+  
+  .header-small h1 {
+    font-size: 1.3rem;
+  }
+  
+/* =====================
+   Layout principal
+===================== */
+.main-content {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* =====================
+   Sección Servicios
+===================== */
+.services-section {
+  text-align: center;
+}
+
+.services-section h2 {
+  color: #333;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.services-subtitle {
+  color: #777;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.services-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .services-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Servicios ---- */
+.service-item {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.service-item svg {
+  margin-bottom: 12px;
+}
+
+.service-item h4 {
+  color: #d32f2f;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.service-item p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* =====================
+   Sección Simulación
+===================== */
+.simulation-section {
+  margin-top: 40px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.simulation-section h2 {
+  color: #333;
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.simulation-subtitle {
+  color: #777;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+}
+
+/* ---- Opciones de seguro con iconos ---- */
+.insurance-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.insurance-btn {
+  flex: 1;
+  min-width: 100px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.insurance-btn:hover {
+  background-color: #f1f1f1;
+}
+
+.insurance-btn.active {
+  background: #d32f2f;
+  color: white;
+  border-color: #b71c1c;
+}
+
+/* ---- Inputs estilizados ---- */
+.simulation-section .form-group {
+  margin-bottom: 18px;
+}
+
+.simulation-section .form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+.simulation-section .form-control:focus {
+  border-color: #d32f2f;
+  outline: none;
+  box-shadow: 0 0 4px rgba(211, 47, 47, 0.3);
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  margin: 0;
+  height: auto;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ---- Botón Simular ---- */
+.simulate-button {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.simulate-button:hover {
+  background-color: #b71c1c;
+}
+
+.simulation-result {
+  margin-top: 20px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* =====================
+   Asistente
+===================== */
+.assistant-hints ul {
+  list-style: none;
+  padding: 0;
+}
+
+.assistant-hints li {
+  background: #fdecea;
+  padding: 10px;
+  border-left: 4px solid #d32f2f;
+  margin-bottom: 8px;
+  border-radius: 5px;
+}
+
+.assistant-message {
+  background: #fdecea;
+  padding: 12px;
+  border-left: 4px solid #d32f2f;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+/* =====================
+   Botón flotante
+===================== */
+.floating-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.floating-button:hover {
+  background-color: #b71c1c;
+}
+
+.floating-button.active {
+  background-color: #b71c1c;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.6); }
+  70% { box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+}
+
+/* =====================
+   Footer
+===================== */
+.app-footer {
+  background-color: #fff;
+  padding: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+  border-top: 1px solid #e0e0e0;
+}
+
+.app-footer {
+    background-color: #fff;
+    text-align: center;
+    padding: 15px 10px;
+    font-size: 0.9rem;
+    color: #777;
+    border-top: 1px solid #e0e0e0;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+  
+  .app-footer p {
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  .footer-rights {
+    display: block;
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 2px;
+  }
+  
