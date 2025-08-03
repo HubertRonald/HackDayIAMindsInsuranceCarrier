@@ -23,6 +23,7 @@ jobs:
 
       - name: Setup GCP Key
         run: |
+          mkdir -p ${{ env.TF_DIR }}
           echo "${{ secrets.GCP_SA_KEY }}" > ${{ env.TF_DIR }}/gcp-key.json
       
 
