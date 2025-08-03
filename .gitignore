@@ -210,8 +210,10 @@ __marimo__/
 
 # Credenciales
 credentials.json
+credentials_escaped.json
 secret.json
 gcp-key.json
+gcp-key-for-secret.txt
 
 # NO ignorar 
 !package.json
