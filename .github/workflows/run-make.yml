@@ -27,6 +27,5 @@ jobs:
         with:
           terraform_version: 1.8.5
 
-
       - name: Run setup-data
         run: make setup-data
