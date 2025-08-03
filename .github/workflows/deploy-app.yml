@@ -35,7 +35,7 @@ jobs:
           mkdir -p ${{ env.TF_DIR }}
           echo "${{ secrets.GCP_SA_KEY }}" > ${{ env.TF_DIR }}/gcp-key.json
           echo "✅ GCP key file created at ${{ env.TF_DIR }}/gcp-key.json"
-          jq . ${{ env.TF_DIR }}/gcp-key.json
+          jq . ${{ env.TF_DIR }}/gcp-key.json > /dev/null
       
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
