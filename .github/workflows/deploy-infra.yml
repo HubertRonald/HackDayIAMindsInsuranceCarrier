@@ -43,7 +43,7 @@ jobs:
         run: |
           terraform apply -auto-approve \
           -var="project_id=${{ env.PROJECT_ID }}" \
-          -var="credentials_file=$GITHUB_WORKSPACE/gcp-key.json"
+          -var="credentials_file=$GITHUB_WORKSPACE/${{ env.TF_DIR }}/gcp-key.json"
 
   deploy-app:
     needs: terraform
