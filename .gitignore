@@ -209,8 +209,12 @@ marimo/_lsp/
 __marimo__/
 
 # Credenciales
-*.json
+credentials.json
+secret.json
 gcp-key.json
+
+# NO ignorar 
+!package.json
 
 # Node
 node_modules/
