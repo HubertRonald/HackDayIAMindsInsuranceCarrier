@@ -23,7 +23,8 @@ jobs:
 
       - name: Setup GCP Key
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > gcp-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" > ${{ env.TF_DIR }}/gcp-key.json
+      
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
