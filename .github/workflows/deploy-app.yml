@@ -17,11 +17,12 @@ env:
   TF_DIR: ${{ vars.TF_DIR }}
 
 jobs:
-  # =============================
-  # 1️⃣ Terraform - Infraestructura
-  # =============================
   terraform:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'   # necesario para OIDC
+
     defaults:
       run:
         working-directory: ${{ env.TF_DIR }}
@@ -30,18 +31,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup GCP Key
-        run: |
-          mkdir -p ${{ env.TF_DIR }}
-          echo '${{ secrets.GCP_SA_KEY }}' \
-            | sed 's/\\r//g' \
-            | sed 's/\\n/\n/g' \
-            | tr -d '\000-\031' \
-            > ${{ env.TF_DIR }}/gcp-key.json
-          echo "✅ GCP key file created at ${{ env.TF_DIR }}/gcp-key.json"
-          cat ${{ env.TF_DIR }}/gcp-key.json | jq . > /dev/null
-      
-      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -49,30 +43,31 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: |
-          terraform apply -auto-approve \
-          -var="project_id=${{ env.PROJECT_ID }}" \
-          -var="credentials_file=${{ env.TF_DIR }}/gcp-key.json"
+        run: terraform apply -auto-approve -var="project_id=${{ env.PROJECT_ID }}"
 
-  # =============================
-  # 2️⃣ Deploy App (Backend + Frontend)
-  # =============================
   deploy-app:
     needs: terraform
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      # ---- BACKEND ----
+      # BACKEND
       - name: Build and Push Backend Docker image
         run: |
           gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
@@ -97,7 +92,7 @@ jobs:
             --format 'value(status.url)')
           echo "BACKEND_URL=$URL" >> $GITHUB_ENV
 
-      # ---- FRONTEND ----
+      # FRONTEND
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
