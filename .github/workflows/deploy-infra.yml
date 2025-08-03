@@ -31,19 +31,20 @@ jobs:
         run: |
           mkdir -p ${{ env.TF_DIR }}
           echo "${{ secrets.GCP_SA_KEY }}" > ${{ env.TF_DIR }}/gcp-key.json
+          ls -lh ${{ env.TF_DIR }}/gcp-key.json
       
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Init Terraform
+      - name: Terraform Init
         run: terraform init
 
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve \
           -var="project_id=${{ env.PROJECT_ID }}" \
-          -var="credentials_file=$GITHUB_WORKSPACE/${{ env.TF_DIR }}/gcp-key.json"
+          -var="credentials_file=${{ env.TF_DIR }}/gcp-key.json"
 
   deploy-app:
     needs: terraform
