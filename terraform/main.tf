@@ -18,16 +18,15 @@ terraform {
 }
 
 provider "google" {
-  project     = var.project_id
-  credentials = file(var.credentials_file)
-  region      = var.region
+  project = var.project_id
+  region  = var.region
 }
 
 provider "google-beta" {
-  project     = var.project_id
-  credentials = file(var.credentials_file)
-  region      = var.region
+  project = var.project_id
+  region  = var.region
 }
+
 
 # ---------- ARTIFACT REGISTRY ----------
 resource "google_artifact_registry_repository" "hackday_repo" {
