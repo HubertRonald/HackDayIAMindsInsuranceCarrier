@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 5.0.0"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 5.0.0"
+    }
   }
 
   backend "local" {
@@ -14,6 +18,12 @@ terraform {
 }
 
 provider "google" {
+  project     = var.project_id
+  credentials = file(var.credentials_file)
+  region      = var.region
+}
+
+provider "google-beta" {
   project     = var.project_id
   credentials = file(var.credentials_file)
   region      = var.region
@@ -108,6 +118,7 @@ resource "google_cloud_run_service_iam_member" "invoker" {
 
 # ---------- FIREBASE WEB APP ----------
 resource "google_firebase_web_app" "frontend" {
+  provider     = google-beta
   display_name = "HackDay Gemini Assistant Web App"
   project      = var.project_id
 }
