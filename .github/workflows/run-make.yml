@@ -21,11 +21,14 @@ jobs:
 
       - name: Install Make
         run: sudo apt-get install -y make
+<<<<<<< HEAD
       
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.8.5
+=======
+>>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
 
       - name: Run setup-data
         run: make setup-data

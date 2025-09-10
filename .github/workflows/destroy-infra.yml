@@ -13,10 +13,13 @@ env:
 jobs:
   terraform-destroy:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     permissions:
       contents: 'read'
       id-token: 'write'   # necesario para autenticación OIDC
 
+=======
+>>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
     defaults:
       run:
         working-directory: ${{ env.TF_DIR }}
@@ -25,10 +28,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+<<<<<<< HEAD
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
+=======
+      - name: Setup GCP Key
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > gcp-key.json
+>>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -37,11 +46,18 @@ jobs:
         run: terraform init
 
       - name: Terraform Destroy
+<<<<<<< HEAD
         run: terraform destroy -auto-approve -var="project_id=${{ env.PROJECT_ID }}"
+=======
+        run: terraform destroy -auto-approve \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="credentials_file=gcp-key.json"
+>>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
 
   cleanup-cloud-run:
     needs: terraform-destroy
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -51,6 +67,15 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
+=======
+    steps:
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+>>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
 
       - name: Delete Cloud Run service
         run: |
@@ -68,7 +93,10 @@ jobs:
   cleanup-firebase:
     needs: terraform-destroy
     runs-on: ubuntu-latest
+<<<<<<< HEAD
 
+=======
+>>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
     steps:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
