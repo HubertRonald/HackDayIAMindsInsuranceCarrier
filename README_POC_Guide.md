@@ -32,7 +32,7 @@ flowchart LR
     D["GitHub Actions"]
     E["Deploy Cloud Run Backend"]
     F["Deploy Firebase Hosting"]
-    G["App en Producción"]
+    G["App desplegada (estado histórico por verificar)"]
     A --> B --> C --> D --> E --> F --> G
 ```
 

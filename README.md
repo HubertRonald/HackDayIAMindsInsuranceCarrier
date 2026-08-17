@@ -27,6 +27,8 @@
 
 # HackDay Gemini Assistant
 
+> **2026 portfolio note:** This repository documents a historical 2025 prototype. Current/live deployment status must be verified independently; 2026 changes are documentation and reproducibility remediation, not backdated project work.
+
 ## 🚀 Descripción
 
 Este proyecto implementa un **asistente multimodal** (voz + análisis visual) para un caso de uso de seguros, con backend en **Cloud Run** y frontend en **Firebase Hosting**.
@@ -38,6 +40,20 @@ Permite:
 - **Simulación dinámica de cotizaciones**.
 - **Interacción gráfica en tiempo real** (tooltips, resaltar campos) mediante WebSockets.
 
+
+## 🏛️ Arquitectura
+
+La arquitectura observada del prototipo histórico integra una interfaz **React**, un backend **FastAPI** desplegable en **Cloud Run**, inferencia multimodal directa con **Gemini 1.5 Flash** y persistencia en **BigQuery** y **Firestore**.
+
+> **Boundary note:** Firestore `(default)` es una precondición externa al Terraform incluido en este repositorio. Firebase Hosting se publica mediante GitHub Actions/Firebase CLI. El diagrama documenta evidencia del sistema y no implica que exista actualmente un deployment activo.
+
+<p align="center">
+  <img
+    src="figs/hackday_iaminds_insurance_carrier_architecture.png"
+    alt="HackDay IA Minds Insurance Carrier architecture"
+    width="100%"
+  />
+</p>
 
 ## 📂 Estructura del Proyecto
 
@@ -67,7 +83,6 @@ Permite:
 │   ├── main.tf
 │   ├── variables.tf
 │   ├── outputs.tf
-│   ├── gcp-key.json        # ⚠️ No subir a GitHub
 │   └── README.md
 │
 ├── data/
@@ -77,9 +92,11 @@ Permite:
 │   └── utils/
 │       └── paths.py
 │
+├── figs/
+│   └── hackday_iaminds_insurance_carrier_architecture.png
+│
 ├── .github/
 │   └── workflows/
-│       ├── deploy-infra.yml
 │       ├── deploy-app.yml
 │       ├── destroy-infra.yml
 │       └── populate-data.yml
@@ -148,7 +165,7 @@ El frontend usará la variable `REACT_APP_API_URL` definida en `.env` (`http://l
 
 | **Comando**           | **Workflow llamado**                  | **Acción en GCP**                                                      |
 | --------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
-| make deploy-actions   | `.github/workflows/deploy-infra.yml`  | 🚀 Despliega infraestructura (Terraform) y app (Cloud Run + Firebase). |
+| make deploy-actions   | `.github/workflows/deploy-app.yml`    | 🚀 Despliega infraestructura (Terraform) y app (Cloud Run + Firebase). |
 | make populate-actions | `.github/workflows/populate-data.yml` | 📦 Pobla BigQuery y Firestore con datos dummy.                         |
 | make destroy-actions  | `.github/workflows/destroy-infra.yml` | 🗑️ Elimina infraestructura, servicio Cloud Run y Firebase Hosting.    |
 
@@ -158,8 +175,8 @@ El frontend usará la variable `REACT_APP_API_URL` definida en `.env` (`http://l
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 flowchart LR
-    A[Push a main/dev] --> B[Deploy Infra & App Workflow]
-    B --> C[Terraform: Crea infraestructura BigQuery, Firestore, Artifact Registry, Cloud Run, Firebase]
+    A[Push a main / releases/** o ejecución manual] --> B[Deploy Infra & App Workflow]
+    B --> C[Terraform: Crea BigQuery, Artifact Registry, Cloud Run y Firebase Web App; Firestore debe existir previamente]
     C --> D[Build & Deploy Backend en Cloud Run]
     D --> E[Build Frontend e inyección URL Backend]
     E --> F[Deploy Frontend en Firebase Hosting]
@@ -207,4 +224,4 @@ Este proyecto está bajo licencia MIT - ver la [LICENCIA](LICENSE) archivo (en i
 
 ---
 
-👨‍💻 **HackDay 2025 IA Minds - Eremia**
+👨‍💻 **HackDay 2025 — IA Minds**
