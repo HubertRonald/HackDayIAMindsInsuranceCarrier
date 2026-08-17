@@ -49,7 +49,7 @@ La arquitectura observada del prototipo histórico integra una interfaz **React*
 
 <p align="center">
   <img
-    src="figs/hackday_iaminds_insurance_carrier_architecture.png"
+    src="./figs/hackday_iaminds_insurance_carrier_architecture.png"
     alt="HackDay IA Minds Insurance Carrier architecture"
     width="100%"
   />
