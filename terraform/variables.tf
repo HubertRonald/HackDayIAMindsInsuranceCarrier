@@ -21,11 +21,6 @@ variable "region" {
   default     = "us-central1"
 }
 
-variable "credentials_file" {
-  description = "Ruta al archivo JSON de cuenta de servicio"
-  type        = string
-}
-
 variable "service_name" {
   description = "Nombre del servicio Cloud Run"
   type        = string

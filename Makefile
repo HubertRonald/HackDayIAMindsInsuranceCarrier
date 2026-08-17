@@ -10,7 +10,6 @@ SERVICE_NAME=hackday-gemini-backend
 PYTHON=python3
 
 export GCP_PROJECT_ID ?= $(shell echo $$GCP_PROJECT_ID)
-export GOOGLE_APPLICATION_CREDENTIALS ?= $(TERRAFORM_DIR)/gcp-key.json
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 
 # ==============================
@@ -18,23 +17,21 @@ BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 # ==============================
 deploy-infra:
 	cd $(TERRAFORM_DIR) && terraform init && terraform apply -auto-approve \
-		-var="project_id=$(GCP_PROJECT_ID)" \
-		-var="credentials_file=$(GOOGLE_APPLICATION_CREDENTIALS)"
+		-var="project_id=$(GCP_PROJECT_ID)"
 
 destroy-infra:
 	cd $(TERRAFORM_DIR) && terraform destroy -auto-approve \
-		-var="project_id=$(GCP_PROJECT_ID)" \
-		-var="credentials_file=$(GOOGLE_APPLICATION_CREDENTIALS)"
+		-var="project_id=$(GCP_PROJECT_ID)"
 	@echo "⚠️ Infraestructura eliminada correctamente."
 
 validate-infra:
-	@if ! gcloud bigquery datasets describe hackday_data --project=$(GCP_PROJECT_ID); then \
+	@if ! bq show --format=prettyjson "$(GCP_PROJECT_ID):hackday_data" >/dev/null 2>&1; then \
 		echo "❌ Dataset BigQuery no encontrado. Ejecuta 'make deploy-infra' primero."; exit 1; \
 	fi
-	@if ! gcloud firestore databases describe --project=$(GCP_PROJECT_ID) --location=nam5; then \
-		echo "❌ Firestore no encontrado. Ejecuta 'make deploy-infra' primero."; exit 1; \
+	@if ! gcloud firestore databases describe --project="$(GCP_PROJECT_ID)" --database="(default)" >/dev/null 2>&1; then \
+		echo "❌ Firestore no encontrado. La base '(default)' debe existir previamente en el proyecto."; exit 1; \
 	fi
-	@echo "✅ Infraestructura validada correctamente."
+	@echo "✅ BigQuery y la precondición externa de Firestore están disponibles."
 
 # ==============================
 # Datos Dummy
@@ -80,8 +77,8 @@ deploy-app: deploy-backend deploy-frontend
 # GitHub Actions
 # ==============================
 deploy-actions:
-	gh workflow run deploy-infra.yml -r $(BRANCH)
-	@echo "🚀 Workflow 'deploy-infra.yml' disparado en GitHub Actions."
+	gh workflow run deploy-app.yml -r $(BRANCH)
+	@echo "🚀 Workflow 'deploy-app.yml' disparado en GitHub Actions."
 
 populate-actions:
 	gh workflow run populate-data.yml -r $(BRANCH)

@@ -210,15 +210,10 @@ __marimo__/
 
 # Credenciales
 credentials.json
-<<<<<<< HEAD
 credentials_escaped.json
 secret.json
 gcp-key.json
 gcp-key-for-secret.txt
-=======
-secret.json
-gcp-key.json
->>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
 
 # NO ignorar 
 !package.json

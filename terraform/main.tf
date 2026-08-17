@@ -4,15 +4,12 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 5.0.0"
+      version = "= 5.45.2"
     }
-<<<<<<< HEAD
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = ">= 5.0.0"
+      version = "= 5.45.2"
     }
-=======
->>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
   }
 
   backend "local" {
@@ -21,7 +18,6 @@ terraform {
 }
 
 provider "google" {
-<<<<<<< HEAD
   project = var.project_id
   region  = var.region
 }
@@ -32,13 +28,6 @@ provider "google-beta" {
 }
 
 
-=======
-  project     = var.project_id
-  credentials = file(var.credentials_file)
-  region      = var.region
-}
-
->>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
 # ---------- ARTIFACT REGISTRY ----------
 resource "google_artifact_registry_repository" "hackday_repo" {
   location      = var.region
@@ -49,9 +38,9 @@ resource "google_artifact_registry_repository" "hackday_repo" {
 
 # ---------- BIGQUERY DATASET ----------
 resource "google_bigquery_dataset" "hackday_dataset" {
-  dataset_id                  = "hackday_data"
-  location                    = "US"
-  delete_contents_on_destroy  = true
+  dataset_id                 = "hackday_data"
+  location                   = "US"
+  delete_contents_on_destroy = true
 }
 
 # ---------- BIGQUERY TABLE ----------
@@ -128,10 +117,7 @@ resource "google_cloud_run_service_iam_member" "invoker" {
 
 # ---------- FIREBASE WEB APP ----------
 resource "google_firebase_web_app" "frontend" {
-<<<<<<< HEAD
   provider     = google-beta
-=======
->>>>>>> e43e1194718c748c7abcbace9e38cabb8f78d4da
   display_name = "HackDay Gemini Assistant Web App"
   project      = var.project_id
 }

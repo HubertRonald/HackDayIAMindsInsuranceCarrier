@@ -9,7 +9,7 @@ on:
   workflow_dispatch: # También ejecutable manualmente desde GitHub Actions
 
 env:
-  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   REGION: ${{ vars.GCP_REGION }}
   DATA_DIR: data
 
@@ -38,10 +38,13 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Validate BigQuery dataset
         run: |
           echo "🔍 Validando dataset BigQuery..."
-          if ! gcloud bigquery datasets describe hackday_data --project=${{ env.PROJECT_ID }}; then
+          if ! bq show --format=prettyjson "${{ env.GCP_PROJECT_ID }}:hackday_data" >/dev/null; then
             echo "❌ Dataset BigQuery no encontrado. Asegúrate de ejecutar Terraform primero."
             exit 1
           fi
@@ -49,8 +52,8 @@ jobs:
       - name: Validate Firestore
         run: |
           echo "🔍 Validando instancia Firestore..."
-          if ! gcloud firestore databases describe --project=${{ env.PROJECT_ID }} --location=nam5; then
-            echo "❌ Firestore no encontrado. Asegúrate de ejecutar Terraform primero."
+          if ! gcloud firestore databases describe --project="${{ env.GCP_PROJECT_ID }}" --database="(default)" >/dev/null; then
+            echo "❌ Firestore no encontrado. La base '(default)' debe existir previamente en el proyecto."
             exit 1
           fi
 
